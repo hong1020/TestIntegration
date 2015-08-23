@@ -24,7 +24,7 @@ public class LeaderSelectorExample
 
         List<CuratorFramework>  clients = Lists.newArrayList();
         List<ExampleClient>     examples = Lists.newArrayList();
-        String connectionString = "192.168.0.105:2181";
+        String connectionString = "192.168.0.108:2181";
         try
         {
             for ( int i = 0; i < CLIENT_QTY; ++i )

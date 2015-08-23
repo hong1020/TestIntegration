@@ -3,20 +3,22 @@ package task;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by hongcheng on 8/19/15.
  */
 public class TaskSyncClient extends LeaderSelectorListenerAdapter implements Closeable {
+    private final static Logger logger = LoggerFactory.getLogger(TaskSyncClient.class);
 
     private final LeaderSelector leaderSelector;
     private final AtomicBoolean isLeader = new AtomicBoolean();
-    private final Object lock = new Object();
+    private final Object signal = new Object();
 
     public TaskSyncClient(CuratorFramework client, String path)
     {
@@ -28,25 +30,28 @@ public class TaskSyncClient extends LeaderSelectorListenerAdapter implements Clo
 
         // for most cases you will want your instance to requeue when it relinquishes leadership
         leaderSelector.autoRequeue();
+    }
 
+    public void start() throws IOException{
         leaderSelector.start();
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         isLeader.set(false);
         leaderSelector.close();
+        notify();
     }
 
     @Override
-    public void takeLeadership(CuratorFramework client) throws Exception {
+    public synchronized void takeLeadership(CuratorFramework client) throws Exception {
+        logger.info("take the leadership");
+
         isLeader.set(true);
 
         try
         {
-            synchronized (lock) {
-                lock.wait();
-            }
+            wait();
         }
         catch ( InterruptedException e )
         {
@@ -56,6 +61,8 @@ public class TaskSyncClient extends LeaderSelectorListenerAdapter implements Clo
         {
             isLeader.set(false);
         }
+
+        logger.info("release the leadership");
     }
 
     public boolean isMainClient() {
