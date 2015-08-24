@@ -1,9 +1,11 @@
-package task;
+package task.example;
 
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import task.TaskSyncClient;
+import task.ThreadPoolTaskSchedulerZkSync;
 
 import java.util.List;
 
