@@ -18,7 +18,6 @@ public class TaskSyncClient extends LeaderSelectorListenerAdapter implements Clo
 
     private final LeaderSelector leaderSelector;
     private final AtomicBoolean isLeader = new AtomicBoolean();
-    private final Object signal = new Object();
 
     public TaskSyncClient(CuratorFramework client, String path)
     {
@@ -32,7 +31,7 @@ public class TaskSyncClient extends LeaderSelectorListenerAdapter implements Clo
         leaderSelector.autoRequeue();
     }
 
-    public void start() throws IOException{
+    public synchronized void start() throws IOException{
         leaderSelector.start();
     }
 

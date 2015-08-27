@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/task
+            http://www.springframework.org/schema/task/spring-task-4.0.xsd
+		    http://www.springframework.org/schema/beans
+		    http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		    http://www.springframework.org/schema/context
+		    http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+    <context:property-placeholder
+            local-override="true"
+            location="classpath:zk.config"
+            ignore-resource-not-found="false"
+            ignore-unresolvable="false" />
+
+    <context:annotation-config />
+    <context:component-scan base-package="task"/>
+
+    <bean id="taskScheduler" class="task.ThreadPoolTaskSchedulerZkSync">
+        <constructor-arg value="${zk_connection_string}" index="0"/>
+        <constructor-arg value="${zk_task_scheduler_leader}" index="1"/>
+        <property name="poolSize" value="1"/>
+    </bean>
+
+    <task:annotation-driven scheduler="taskScheduler"/>
+</beans>

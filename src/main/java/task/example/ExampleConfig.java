@@ -13,7 +13,7 @@ import task.ThreadPoolTaskSchedulerZkSync;
 /**
  * Created by hongcheng on 8/24/15.
  */
-@Configuration
+//@Configuration
 public class ExampleConfig {
 
     @Value("${zk_connection_string}")
